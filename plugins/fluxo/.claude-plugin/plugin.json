@@ -1,0 +1,15 @@
+{
+  "name": "fluxo",
+  "version": "1.0.0",
+  "description": "Fluxo de desenvolvimento orquestrado (PO, planejador, arquiteto, executor, validador, QA, commits, rastreador e testes de aceite) para Jira ou Azure Boards.",
+  "keywords": [
+    "orquestrador",
+    "multi-agent",
+    "jira",
+    "azure-boards",
+    "xray",
+    "copilot",
+    "cursor",
+    "claude-code"
+  ]
+}
