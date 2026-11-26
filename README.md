@@ -4,6 +4,12 @@ Plugin orquestrador de desenvolvimento multi-agente padronizado para governança
 
 ---
 
+## Visão Geral e Capacidades da Squad Agentica
+
+Este projeto implementa um **plugin orquestrador de desenvolvimento multi-agente**, focado na criação de uma **squad agentica** autônoma. O objetivo é automatizar e otimizar o ciclo de vida de desenvolvimento de software, desde o refinamento de requisitos até o deploy, com máxima autonomia e rastreabilidade.
+
+O coração deste sistema é o seu fluxo de trabalho detalhado, que orquestra agentes especializados para cada etapa, gerenciando o progresso, interações e decisões de forma inteligente.
+
 ## Como Funciona
 
 O sistema opera via uma **Sessão Principal como Orquestrador**, onde o assistente principal de IA assume o papel definido em `playbook-orquestrador.md`. O Orquestrador não executa alterações diretas de código quando há agentes especializados designados; em vez disso, ele:
@@ -48,6 +54,10 @@ flowchart TD
     Step8 --> StepSync["Sincronizador: Atualiza Tracker (PR Vinculado)"]
     StepSync --> End(["Fim do Fluxo"])
 ```
+
+## Compatibilidade Multiplataforma de IA
+
+A arquitetura do workflow_agente é projetada para ser compatível e adaptável a múltiplas plataformas de assistentes de IA, incluindo **Claude Code**, **GitHub Copilot** e **Cursor**. Um script de orquestração de exemplo, [orquestrador-squad-agentica.mjs](scripts/orquestrador-squad-agentica.mjs), ilustra a adaptabilidade, mostrando como a delegação de tarefas e a interação entre agentes podem ser implementadas em cada ambiente, garantindo um fluxo de trabalho consistente e eficiente.
 
 ---
 
@@ -104,6 +114,38 @@ Cada desenvolvedor pode ter suas preferências locais sem impactar o repositóri
 - `~/.fluxo-desenvolvimento/config.md`: Parâmetros de override de ferramentas, modelos e pipelines.
 - `~/.fluxo-desenvolvimento/regras.md`: Diretrizes locais de estilo de trabalho.
 - `~/.fluxo-desenvolvimento/conhecimento/<papel>.md`: Contexto customizado para agilizar a atuação dos papéis.
+
+---
+
+## Configuração e Uso
+
+### Flexibilidade na Definição de Tarefas
+
+O `workflow_agente` permite que as tarefas de desenvolvimento sejam iniciadas de diferentes formas:
+
+*   Através de **links ou IDs de sistemas de rastreamento de tarefas** (como Jira, Azure DevOps ou GitHub Issues), quando configurado.
+*   Por **descrições textuais diretas** fornecidas pelo usuário, permitindo agilidade para tarefas de desenvolvimento sem vínculo formal a um board.
+
+A preferência e a configuração do provedor de tarefas são gerenciadas no arquivo de modelo: [config-modelo.md](plugins/fluxo/config-modelo.md), na seção `rastreador.provedor`.
+
+### Acesso a Ferramentas do Sistema (PowerShell, Git, etc.)
+
+É fundamental compreender que o **acesso a ferramentas do sistema**, como o PowerShell para a execução de comandos de build, teste, linter, ou ferramentas Git para controle de versão, é uma capacidade nativa e intrínseca do ambiente do assistente de IA (via Copilot SDK e seus equivalentes em outras plataformas). O `workflow_agente` e seus agentes definem **como** e **quando** essas ferramentas devem ser utilizadas dentro do fluxo orquestrado, mas não são responsáveis por conceder ou configurar o acesso a elas.
+
+### Executando o Orquestrador de Exemplo
+
+Para visualizar e testar o fluxo simulado da squad agentica, você pode executar o script de orquestração de exemplo utilizando Node.js no seu terminal PowerShell:
+
+```powershell
+# Para simular o fluxo para GitHub Copilot (será o padrão se nenhum argumento for fornecido)
+node .\scripts\orquestrador-squad-agentica.mjs copilot
+
+# Para simular o fluxo para Cursor
+node .\scripts\orquestrador-squad-agentica.mjs cursor
+
+# Para simular o fluxo para Claude
+node .\scripts\orquestrador-squad-agentica.mjs claude
+```
 
 ---
 
