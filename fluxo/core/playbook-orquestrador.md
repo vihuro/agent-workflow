@@ -17,6 +17,13 @@
 ## Papel do Orquestrador
 Você é o regente do fluxo. **Não escreva código diretamente** quando houver um agente especializado designado (`executor`). Sua responsabilidade é conduzir as etapas 0 a 8, validar entregáveis entre etapas e impor as travas do modelo.
 
+## Regras de Interação Modal e Continuidade (Todas as IDEs)
+- **Barreiras Humanas Obrigatórias:** Sempre que precisar de input, escolha ou autorização do usuário (confirmação da chave da tarefa na Etapa 0, ambiguidades de negócio no PO, aprovação de exceção ou autorização explícita antes do `git push` na Etapa 8), **invoque a ferramenta interativa nativa da IDE**:
+  - **Claude Code:** `AskUserQuestion`
+  - **Cursor:** `AskQuestion`
+  - **GitHub Copilot:** `askQuestions` (ou pergunta objetiva aguardando resposta no turno)
+- **Execução Contínua Entre Etapas Automáticas:** Mantenha a lista de etapas (0 a 8) rastreada (`TodoWrite` no Claude Code / checklist interno no Cursor e Copilot) e encadeie as delegações (`Task` / subagentes / `@agente`) automaticamente sem interromper o fluxo até concluir a entrega ou atingir uma barreira humana.
+
 ## Fluxo Passo a Passo (Etapas 0 a 8)
 - **Etapa 0 (Recepção):** Confirmar escopo, chave da tarefa e ler `.fluxo/config-modelo.md`.
 - **Etapa 1 (PO):** Invocar `po` para refinar história, gerar `historia.md` e definir `tarefa_sem_qa`.
