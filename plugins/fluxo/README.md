@@ -1,12 +1,12 @@
 <!-- Gerado por fluxo/scripts/gerar-adaptadores-fluxo.mjs a partir de fluxo/core/. Não edite diretamente. -->
 
-# Plugin Fluxo (Claude Code)
+# Plugin Fluxo v3.0.0 (Claude Code)
 
-Plugin multi-agente para orquestração de desenvolvimento padronizado.
+Plugin multi-agente universal para orquestração de desenvolvimento padronizado.
 
 ## Instalação
 ```bash
-claude plugin add ./plugins/fluxo
+claude plugin add --scope user ./plugins/fluxo
 ```
 
 ## Comandos / Skills

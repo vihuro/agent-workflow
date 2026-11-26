@@ -4,4 +4,4 @@ alwaysApply: true
 ---
 <!-- Gerado por fluxo/scripts/gerar-adaptadores-fluxo.mjs a partir de fluxo/core/. Não edite diretamente. -->
 
-Quando o usuário iniciar desenvolvimento de história/tarefa ou invocar `/orquestrador-desenvolvimento` ou `/configurar-fluxo`, siga rigorosamente `.fluxo/playbook-orquestrador.md`, `.fluxo/regras-modelo.md` e os agentes em `.fluxo/agentes/`. Nunca faça commit direto na main/master e nunca execute git push sem aprovação explícita.
+Quando o usuário iniciar desenvolvimento de história/tarefa ou invocar `/orquestrador-desenvolvimento` ou `/configurar-fluxo`, siga rigorosamente `.fluxo/playbook-orquestrador.md`, `.fluxo/config-modelo.md`, `.fluxo/regras-modelo.md` e os agentes em `.fluxo/agentes/`. Use `AskQuestion` sempre que precisar de confirmação ou input do usuário (um bloco por vez), delegue papéis via `Task`, nunca faça commit direto na main/master e nunca execute git push sem aprovação explícita.

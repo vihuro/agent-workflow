@@ -1,13 +1,14 @@
 {
   "name": "fluxo",
-  "version": "1.0.0",
-  "description": "Fluxo de desenvolvimento orquestrado (PO, planejador, arquiteto, executor, validador, QA, commits, rastreador e testes de aceite) para Jira ou Azure Boards.",
+  "version": "3.0.0",
+  "description": "Orquestrador universal de desenvolvimento multi-agente (Jira, Azure DevOps, TFS)",
   "keywords": [
-    "orquestrador",
+    "orchestrator",
     "multi-agent",
+    "development-workflow",
     "jira",
-    "azure-boards",
-    "xray",
+    "azure-devops",
+    "tfs",
     "copilot",
     "cursor",
     "claude-code"

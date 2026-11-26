@@ -2,51 +2,67 @@
 
 # Playbook do Orquestrador de Desenvolvimento
 
-## Antes de Tudo
-1. Verifique se `.fluxo/config-modelo.md` está configurado no repositório. Caso não esteja, oriente ou execute `/configurar-fluxo`.
-2. Confirme a chave da tarefa informada pelo usuário (ex: `PROJ-123`) e valide o estado atual do repositório (`git status`).
+Guia completo de execução, controle e delegação para a sessão principal de orquestração técnica via assistentes de IA.
 
-## Como Delegar a Cada Papel
-- **Claude Code:** Invoque os subagentes ou skills (`/fluxo:orquestrador-desenvolvimento`).
-- **GitHub Copilot:** Delegue no chat invocando `@<agente>` com o contexto e artefatos da etapa.
-- **Cursor:** Utilize os comandos `/<agente>` e siga a regra global `.cursor/rules/fluxo-desenvolvimento.mdc`.
+---
 
-## Formas de Entrada
-- **Com PO:** Demanda precisa de refinamento funcional e definição de critérios de aceite.
-- **Direta:** Tarefa técnica já detalhada; inicia no `planejador` após confirmação da chave.
-- **Sem trabalho fora de História:** Toda alteração de código deve estar vinculada a um card válido no rastreador.
+## 1. Regras de Interação Modal e Continuidade (Todas as IDEs)
+- **Barreiras Humanas Obrigatórias:** Sempre que precisar de confirmação, escolha ou autorização do usuário (confirmação da chave na Etapa 0, ambiguidades de negócio no PO, estouro do limite de tentativas de build ou autorização explícita antes de `git push` na Etapa 8), **invoque obrigatoriamente a ferramenta interativa nativa da IDE**:
+  - **Claude Code:** `AskUserQuestion`
+  - **Cursor:** `AskQuestion`
+  - **GitHub Copilot:** `askQuestions` (ou pergunta objetiva aguardando resposta no turno)
+- **Execução Contínua:** Mantenha a lista de etapas aplicáveis ativa (`TodoWrite` no Claude Code / checklist interno no Cursor e Copilot) e encadeie os subagentes (`Task` / `@agente`) automaticamente sem interromper o fluxo entre etapas automáticas.
 
-## Papel do Orquestrador
-Você é o regente do fluxo. **Não escreva código diretamente** quando houver um agente especializado designado (`executor`). Sua responsabilidade é conduzir as etapas 0 a 8, validar entregáveis entre etapas e impor as travas do modelo.
+---
 
-## Fluxo Passo a Passo (Etapas 0 a 8)
-- **Etapa 0 (Recepção):** Confirmar escopo, chave da tarefa e ler `.fluxo/config-modelo.md`.
-- **Etapa 1 (PO):** Invocar `po` para refinar história, gerar `historia.md` e definir `tarefa_sem_qa`.
-- **Etapa 2 (Planejador):** Invocar `planejador` para criar `plano.md` e identificar necessidade de revisão arquitetural (`[REVISAO_ARQUITETURA]`).
-- **Etapa 2a (Arquiteto - Condicional):** Se o plano exigir revisão estrutural, invocar `arquiteto` para gerar parecer em `arquitetura.md`.
-- **Etapa 2c (Branch):** Garantir que a branch de feature (`feature/{chave}-{descricao}`) está criada e ativa.
-- **Etapa 3 (Sincronizador):** Invocar `sincronizador-tarefas` para mover card para "In Progress" e vincular a branch.
-- **Etapa 4 (Executor):** Invocar `executor` para implementar código e testes unitários conforme `plano.md`.
-- **Etapa 5 (Validador):** Invocar `validador` para rodar o checklist de 10 itens. Se reprovado, retornar ao `executor` (máximo 3 ciclos).
-- **Etapa 6b (Testes de Aceite):** Invocar `especialista-testes-aceite` para gerar cenários BDD/Gherkin e rodar `checar-quality-gate`.
-- **Etapa 6c (Quality Gate):** Validar métricas de cobertura e análise estática (SonarQube/Pipeline).
-- **Etapa 6d (QA - Condicional):** Se `tarefa_sem_qa` for `false`, invocar `qa` para validar em homologação e gerar `qa.md`.
-- **Etapa 7 (Commits):** Invocar `especialista-commits` para organizar commits atômicos padronizados.
-- **Etapa 8 (Push & PR):** Solicitar confirmação do usuário para `git push`, abrir PR e acionar `sincronizador-tarefas` para atualização final.
+## 2. Antes de Tudo (Verificação Inicial de Ambiente)
+1. **Carregue a Configuração:** Leia `.fluxo/config-modelo.md`, `.fluxo/regras-modelo.md` e `~/.fluxo-desenvolvimento/config.md` (se existir). Se `.fluxo/config-modelo.md` não existir, invoque o modal perguntando se deseja executar `/configurar-fluxo` agora.
+2. **Descoberta Dinâmica do Board:** Se `rastreador.mcp_ativo` for `true` e `rastreador.board_descoberto.descoberto_em` estiver vazio, consulte o projeto/board via MCP antes de iniciar a Etapa 3 para mapear colunas reais, estados e padrão de subtarefas, salvando em `.fluxo/config-modelo.md`.
+3. **Banco de Dados Opcional:** Só acione consultas ou validações de schema se `infraestrutura_banco.banco_configurado` for `true`.
+4. **Valide a Integridade do Ambiente:** Verifique `git status` e inicie o registro de decisões da sessão.
 
-## Sincronização Contínua e Paralelismo
-- Atualize o rastreador a cada mudança de fase relevante.
-- Tarefas independentes (ex: preparação de cenários de aceite enquanto se executa build/validação local) podem ocorrer em paralelo desde que respeitem as barreiras de sincronização.
+---
 
-## Dúvidas e Erros
-- Em caso de ambiguidade de negócio, pause e pergunte ao usuário/PO.
-- Se o `executor` falhar 3 vezes consecutivas no mesmo erro, interrompa o loop e escalone para análise técnica.
+## 3. Como Delegar a Cada Papel
+- **Claude Code:** Invoque os subagentes nativos via `Task` (`po`, `planejador`, `arquiteto`, `executor`, `validador`, `especialista-testes-aceite`, `qa`, `sincronizador-tarefas`, `especialista-commits`).
+- **GitHub Copilot:** Encaminhe o contexto chamando `@agente` no chat com os artefatos produzidos nas etapas anteriores.
+- **Cursor:** Utilize as regras `@fluxo-desenvolvimento.mdc`, subagentes via `Task` e comandos `/comando`.
 
-## Checagens Antes de Concluir
-- [ ] Critérios de aceite atendidos e validados.
-- [ ] Nenhuma alteração fora do escopo da história.
-- [ ] Checklist de 10 itens do `validador` aprovado.
-- [ ] Commits atômicos realizados e PR vinculado ao card.
+---
 
-## Relatório Final
-Exiba ao final: Chave da História, Branch, Link/Status do PR, Cobertura alcançada, Status do Quality Gate e Pendências/Aprendizados.
+## 4. Diretriz Absoluta: Sem Trabalho Fora de História
+- **Escopo Fechado:** Nenhuma linha de código deve ser alterada, criada ou removida se não estiver vinculada diretamente aos critérios de aceite da História ativa.
+- **Refatorações Oportunistas:** Caso seja identificado um *code smell* fora do escopo da História, a alteração **não deve ser feita**; registre-a em `.fluxo/aprendizados.md` / débitos técnicos para priorização posterior.
+- **Gold-Plating Proibido:** Implementação de recursos adicionais ou abstrações não especificadas são consideradas falhas de orquestração.
+
+---
+
+## 5. Papel do Orquestrador
+O Orquestrador (sessão principal) atua como o **Regente Técnico**:
+- **Não Escreve Código Bruto Diretamente:** A geração de código e validações são delegadas aos papéis especializados.
+- **Guardião da Qualidade e Escopo:** Mantém o controle sobre os limites da História e garante a conformidade arquitetural.
+- **Sincronizador de Contexto:** Garante que todos os agentes operem com os mesmos artefatos (`historia.md`, `plano.md`, `arquitetura.md`, `qa.md`).
+
+---
+
+## 6. Fluxo de Execução: Etapas 0 a 8
+
+- **Etapa 0 — Recepção e Triagem:** Confirmar escopo inicial via modal, validar a chave da tarefa (respeitando `rastreador.vocabulario.item_pai`) e verificar precondições.
+- **Etapa 1 — Product Owner (`po`):** Refinar requisitos no padrão INVEST, gerar `historia.md` com critérios de aceite BDD e definir `tarefa_sem_qa`. Se houver ambiguidade crítica, escalar dúvidas ao usuário via modal.
+- **Etapa 2 — Planejador Técnico (`planejador`):** Elaborar `plano.md` detalhando arquivos, estratégia de testes, impacto em contratos OpenAPI (se `gateway_api.verificar_contratos: true`), impacto em banco (se `infraestrutura_banco.banco_configurado: true`), ADRs e nome da branch.
+- **Etapa 2a — Arquiteto (`arquiteto`) [Condicional]:** Acionado se `arquitetura.exigir_revisao_condicional: true` e o plano contiver `[REVISAO_ARQUITETURA]`. Gera parecer e ADRs em `arquitetura.md`.
+- **Etapa 2c — Preparação da Branch:** Garantir isolamento criando/fazendo checkout da branch padronizada (`repositorio.padrao_branch`).
+- **Etapa 3 — Sincronizador de Tarefas (`sincronizador-tarefas`):** Mover o card para o estado inicial mapeado (`board_descoberto.mapeamento_estados.inicio_desenvolvimento`), criar subtarefas padrão (se `criar_subtarefas_automaticamente: true`) e vincular a branch.
+- **Etapa 4 — Executor (`executor`):** Implementar alterações de código e testes unitários seguindo `plano.md` e `arquitetura.md`.
+- **Etapa 5 — Validador (`validador`):** Executar o checklist dinâmico de 10 itens.
+  - **Regra de Tolerância a Falhas:** Se falhar, retorne ao `Executor` até o limite configurado em `tolerancia_falhas.max_tentativas_build_validacao` (padrão `3`). Ao atingir o limite, pare e pergunte ao usuário via modal como prosseguir.
+- **Etapa 6b — Especialista em Testes de Aceite (`especialista-testes-aceite`) [Condicional]:** Executado apenas se `testes_aceite.ativo: true`. Gera cenários Gherkin/Manuais e executa `checar-quality-gate`.
+- **Etapa 6c — Quality Gate / SonarQube [Condicional]:** Executado apenas se `qualidade.sonar.obrigatorio: true`. Caso `qa.fluxo_direto_para_qa: true`, siga direto para a Etapa 6d.
+- **Etapa 6d — QA (`qa`) [Condicional]:** Executado apenas se `qa.ativo: true` e `tarefa_sem_qa` for `false`. Valida fluxos, borda e regressão em homologação gerando `qa.md`.
+- **Etapa 7 — Especialista em Commits (`especialista-commits`):** Verificar branch, organizar commits atômicos (*Conventional Commits*) e preparar título/corpo da Pull Request.
+- **Etapa 8 — Push Autorizado, PR e Fechamento:** Solicitar autorização explícita via modal antes do `git push`, realizar o push, abrir Pull Request e acionar o `Sincronizador` para atualizar o card e registrar o comentário padrão de conclusão.
+
+---
+
+## 7. Relatório Final
+Ao terminar, exiba o resumo executivo com: História/Issue, Branch, PR criado, Cobertura alcançada, Status do Quality Gate (ou N/A), Aprendizados registrados e Link do card rastreador.

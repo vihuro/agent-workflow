@@ -39,7 +39,6 @@ function compilar() {
     .filter((f) => f.endsWith('.md') && f !== '_comum.md')
     .sort();
 
-  // Limpar saídas geradas
   limparDiretorio(path.join(DIR_ADAPTADORES, 'nucleo'));
   limparDiretorio(path.join(DIR_ADAPTADORES, 'copilot'));
   limparDiretorio(path.join(DIR_ADAPTADORES, 'cursor'));
@@ -51,14 +50,11 @@ function compilar() {
     const conteudoAgente = lerArquivo(path.join(dirAgentesCore, arquivo));
     const conteudoCompleto = `${AVISO_GERADO}${conteudoAgente.trim()}\n\n---\n\n${conteudoComum.trim()}\n`;
 
-    // 1. Núcleo
     escreverArquivo(path.join(DIR_ADAPTADORES, 'nucleo', 'agentes', arquivo), conteudoCompleto);
 
-    // 2. Claude Code Plugin Agents
     const frontmatterClaude = `---\nname: ${nomeBase}\ndescription: Agente especializado em ${nomeBase} do fluxo de desenvolvimento orquestrado.\n---\n\n`;
     escreverArquivo(path.join(DIR_PLUGINS, 'agents', arquivo), frontmatterClaude + conteudoCompleto);
 
-    // 3. GitHub Copilot Agents
     const frontmatterCopilot = `---\ndescription: Agente especializado em ${nomeBase} para o fluxo de desenvolvimento.\n---\n\n`;
     escreverArquivo(
       path.join(DIR_ADAPTADORES, 'copilot', '.github', 'agents', `${nomeBase}.agent.md`),
@@ -66,7 +62,6 @@ function compilar() {
     );
   }
 
-  // Copiar arquivos base do core para adaptadores/nucleo
   const arquivosBase = [
     'config-modelo.md',
     'configurar-fluxo.md',
@@ -93,6 +88,7 @@ ${AVISO_GERADO}Siga integralmente as instruções de \`.fluxo/configurar-fluxo.m
 ## Regra Obrigatória de Interação
 - Execute **UM bloco por vez** (Blocos A a I).
 - Use obrigatoriamente a ferramenta \`askQuestions\` (ou pergunte com opções objetivas e pare o turno aguardando resposta) antes de avançar para o próximo bloco.
+- Se o MCP do rastreador estiver ativo, realize a descoberta automática das colunas do board e subtarefas no Bloco B.
 - Nunca despeje todos os blocos de uma vez e nunca grave segredos no Git.
 `;
   escreverArquivo(
@@ -108,9 +104,9 @@ tools: ['codebase', 'editFiles', 'runCommands', 'askQuestions']
 ${AVISO_GERADO}# Orquestrador de Desenvolvimento
 
 1. Se \`.fluxo/config-modelo.md\` não existir, use \`askQuestions\` perguntando se deseja executar \`/configurar-fluxo\` agora.
-2. Leia e siga \`.fluxo/playbook-orquestrador.md\` como sessão principal.
-3. Use \`askQuestions\` para confirmações obrigatórias (escopo inicial, ambiguidades do PO e autorização antes de \`git push\`).
-4. Delegue cada etapa ao agente especializado correspondente (\`@po\`, \`@planejador\`, \`@arquiteto\`, \`@executor\`, \`@validador\`, \`@especialista-testes-aceite\`, \`@qa\`, \`@sincronizador-tarefas\`, \`@especialista-commits\`).
+2. Leia e siga \`.fluxo/playbook-orquestrador.md\` como sessão principal, respeitando o vocabulário e board descoberto.
+3. Use \`askQuestions\` para confirmações obrigatórias (escopo inicial, ambiguidades do PO, estouro de tentativas de build e autorização antes de \`git push\`).
+4. Delegue cada etapa ativa ao agente especializado correspondente (\`@po\`, \`@planejador\`, \`@arquiteto\`, \`@executor\`, \`@validador\`, \`@especialista-testes-aceite\`, \`@qa\`, \`@sincronizador-tarefas\`, \`@especialista-commits\`).
 `;
   escreverArquivo(
     path.join(DIR_ADAPTADORES, 'copilot', '.github', 'prompts', 'orquestrador-desenvolvimento.prompt.md'),
@@ -125,8 +121,8 @@ Siga integralmente as instruções de \`.fluxo/configurar-fluxo.md\`.
 ## Regra Obrigatória de Interação
 - Execute **UM bloco por vez** (Blocos A a I).
 - Sempre que precisar fazer perguntas ao usuário, **use obrigatoriamente a ferramenta interativa \`AskQuestion\`** do Cursor, aguardando a seleção/resposta antes de avançar para o próximo bloco.
-- Não despeje perguntas em texto corrido no chat encerrando o turno.
-- Nunca grave tokens ou senhas no Git.
+- Se o MCP do rastreador estiver ativo, realize a descoberta automática do board e subtarefas no Bloco B.
+- Não despeje perguntas em texto corrido no chat encerrando o turno e nunca grave tokens ou senhas no Git.
 `;
   escreverArquivo(
     path.join(DIR_ADAPTADORES, 'cursor', '.cursor', 'commands', 'configurar-fluxo.md'),
@@ -136,9 +132,9 @@ Siga integralmente as instruções de \`.fluxo/configurar-fluxo.md\`.
   const cmdOrquestradorCursor = `${AVISO_GERADO}# Orquestrador de Desenvolvimento
 
 1. Se \`.fluxo/config-modelo.md\` não existir, invoque \`AskQuestion\` perguntando se deseja executar \`/configurar-fluxo\` agora.
-2. Leia e siga \`.fluxo/playbook-orquestrador.md\` como sessão principal.
-3. Use \`AskQuestion\` para todas as confirmações obrigatórias (escopo inicial, ambiguidades do PO e autorização antes de \`git push\`).
-4. Delegue cada papel aos subagentes (\`Task\`) seguindo as definições em \`.fluxo/agentes/\` sem parar o fluxo entre etapas automáticas.
+2. Leia e siga \`.fluxo/playbook-orquestrador.md\` como sessão principal, respeitando o vocabulário e o board configurado.
+3. Use \`AskQuestion\` para todas as confirmações obrigatórias (escopo inicial, ambiguidades do PO, limite de tentativas de build e autorização antes de \`git push\`).
+4. Delegue cada papel ativo aos subagentes (\`Task\`) seguindo as definições em \`.fluxo/agentes/\` sem parar o fluxo entre etapas automáticas.
 `;
   escreverArquivo(
     path.join(DIR_ADAPTADORES, 'cursor', '.cursor', 'commands', 'orquestrador-desenvolvimento.md'),
@@ -149,7 +145,7 @@ Siga integralmente as instruções de \`.fluxo/configurar-fluxo.md\`.
 description: Regras do fluxo de desenvolvimento orquestrado (agent-workflow)
 alwaysApply: true
 ---
-${AVISO_GERADO}Quando o usuário iniciar desenvolvimento de história/tarefa ou invocar \`/orquestrador-desenvolvimento\` ou \`/configurar-fluxo\`, siga rigorosamente \`.fluxo/playbook-orquestrador.md\`, \`.fluxo/regras-modelo.md\` e os agentes em \`.fluxo/agentes/\`. Use \`AskQuestion\` sempre que precisar de confirmação ou input do usuário (um bloco por vez), delegue papéis via \`Task\`, nunca faça commit direto na main/master e nunca execute git push sem aprovação explícita.
+${AVISO_GERADO}Quando o usuário iniciar desenvolvimento de história/tarefa ou invocar \`/orquestrador-desenvolvimento\` ou \`/configurar-fluxo\`, siga rigorosamente \`.fluxo/playbook-orquestrador.md\`, \`.fluxo/config-modelo.md\`, \`.fluxo/regras-modelo.md\` e os agentes em \`.fluxo/agentes/\`. Use \`AskQuestion\` sempre que precisar de confirmação ou input do usuário (um bloco por vez), delegue papéis via \`Task\`, nunca faça commit direto na main/master e nunca execute git push sem aprovação explícita.
 `;
   escreverArquivo(
     path.join(DIR_ADAPTADORES, 'cursor', '.cursor', 'rules', 'fluxo-desenvolvimento.mdc'),
@@ -159,15 +155,16 @@ ${AVISO_GERADO}Quando o usuário iniciar desenvolvimento de história/tarefa ou 
   // Claude Code Skills (plugins/fluxo/skills/)
   const skillConfigurarClaude = `---
 name: configurar-fluxo
-description: Configura o fluxo de desenvolvimento no repositório atual (.fluxo/config-modelo.md)
+description: Configura o fluxo de desenvolvimento no repositório atual (.fluxo/config-modelo.md), MCPs, banco opcional e descoberta dinâmica de board
 allowed-tools: Read, Write, Edit, Glob, Grep, AskUserQuestion
 ---
 ${AVISO_GERADO}Siga integralmente as instruções de \`.fluxo/configurar-fluxo.md\` (ou \`fluxo/core/configurar-fluxo.md\`).
 
 ## Comportamento Interativo Obrigatório
-- Para cada bloco de perguntas (Blocos A a I), **invoque obrigatoriamente a ferramenta \`AskUserQuestion\`** com opções objetivas sempre que aplicável (ex: Jira vs Azure DevOps, Xray vs Azure Test Plans vs Nenhum).
-- Faça um bloco por vez, aguarde o retorno da ferramenta \`AskUserQuestion\` e só finalize após gravar \`.fluxo/config-modelo.md\`.
-- Nunca grave segredos em arquivos rastreados pelo Git.
+- Execute **UM bloco por vez** (Blocos A a I).
+- Invoque obrigatoriamente a ferramenta \`AskUserQuestion\` com opções objetivas para cada bloco e aguarde o retorno antes de avançar.
+- Se o MCP do rastreador estiver ativo, inspecione o projeto/board automaticamente no Bloco B para mapear colunas, estados e subtarefas.
+- Só finalize após gravar \`.fluxo/config-modelo.md\`. Nunca grave segredos em arquivos rastreados pelo Git.
 `;
   escreverArquivo(
     path.join(DIR_PLUGINS, 'skills', 'configurar-fluxo', 'SKILL.md'),
@@ -176,25 +173,46 @@ ${AVISO_GERADO}Siga integralmente as instruções de \`.fluxo/configurar-fluxo.m
 
   const skillOrquestradorClaude = `---
 name: orquestrador-desenvolvimento
-description: Orquestra o fluxo completo de desenvolvimento de uma história (PO, planejador, arquiteto, executor, validador, testes de aceite, QA, commits e rastreador)
+description: Orquestra o fluxo completo e adaptável de desenvolvimento de uma história ou tarefa (Jira/Azure/TFS)
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task, TodoWrite, AskUserQuestion
 ---
 ${AVISO_GERADO}Atue como Orquestrador seguindo \`.fluxo/playbook-orquestrador.md\` (ou \`fluxo/core/playbook-orquestrador.md\`).
 
 ## Regras de Execução e Interação
-- Crie a lista de etapas (0 a 8) usando \`TodoWrite\` logo no início para manter o progresso rastreado.
-- Sempre que precisar de confirmação ou decisão humana (confirmação da chave da tarefa, dúvidas de negócio do PO, aprovação de plano ou autorização antes de \`git push\`), **use obrigatoriamente a ferramenta \`AskUserQuestion\`** para abrir a janela interativa de resposta.
-- Delegue cada etapa especializada usando a ferramenta \`Task\` (subagentes \`po\`, \`planejador\`, \`arquiteto\`, \`executor\`, \`validador\`, \`especialista-testes-aceite\`, \`qa\`, \`sincronizador-tarefas\`, \`especialista-commits\`) e continue o loop automaticamente até a conclusão ou próxima barreira humana.
+- Crie a lista de etapas aplicáveis usando \`TodoWrite\` logo no início para manter o progresso rastreado.
+- Sempre que precisar de confirmação ou decisão humana (escopo inicial, dúvidas do PO, limite de tentativas de build ou autorização antes de \`git push\`), invoque obrigatoriamente \`AskUserQuestion\`.
+- Delegue cada etapa ativa usando \`Task\` (subagentes \`po\`, \`planejador\`, \`arquiteto\`, \`executor\`, \`validador\`, \`especialista-testes-aceite\`, \`qa\`, \`sincronizador-tarefas\`, \`especialista-commits\`) e continue o loop automaticamente até a conclusão ou próxima barreira humana.
 `;
   escreverArquivo(
     path.join(DIR_PLUGINS, 'skills', 'orquestrador-desenvolvimento', 'SKILL.md'),
     skillOrquestradorClaude
   );
 
-  // README do plugin Claude
-  const readmePlugin = `${AVISO_GERADO}# Plugin Fluxo (Claude Code)
+  // Plugin manifest & README Claude
+  const pluginManifest = {
+    name: 'fluxo',
+    version: versao,
+    description: 'Orquestrador universal de desenvolvimento multi-agente (Jira, Azure DevOps, TFS)',
+    keywords: [
+      'orchestrator',
+      'multi-agent',
+      'development-workflow',
+      'jira',
+      'azure-devops',
+      'tfs',
+      'copilot',
+      'cursor',
+      'claude-code'
+    ]
+  };
+  escreverArquivo(
+    path.join(DIR_PLUGINS, '.claude-plugin', 'plugin.json'),
+    JSON.stringify(pluginManifest, null, 2) + '\n'
+  );
 
-Plugin multi-agente para orquestração de desenvolvimento padronizado.
+  const readmePlugin = `${AVISO_GERADO}# Plugin Fluxo v${versao} (Claude Code)
+
+Plugin multi-agente universal para orquestração de desenvolvimento padronizado.
 
 ## Instalação
 \`\`\`bash
@@ -207,7 +225,7 @@ claude plugin add --scope user ./plugins/fluxo
 `;
   escreverArquivo(path.join(DIR_PLUGINS, 'README.md'), readmePlugin);
 
-  console.log(`[BUILD] Adaptadores gerados com sucesso para a versão ${versao}.`);
+  console.log(`[BUILD] Adaptadores universais gerados com sucesso para a versão ${versao}.`);
 }
 
 compilar();

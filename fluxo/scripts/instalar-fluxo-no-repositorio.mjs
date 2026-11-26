@@ -80,14 +80,12 @@ function instalarGlobal() {
   console.log(`[INSTALADOR GLOBAL] Ferramentas: ${ferramentas.join(', ')}`);
   console.log(`[INSTALADOR GLOBAL] Modo Simulação (--simular): ${ehSimulacao}\n`);
 
-  // 1. Instalar Núcleo Global (~/.fluxo-desenvolvimento)
   console.log('[1/4] Instalando núcleo global em ~/.fluxo-desenvolvimento...');
   copiarDiretorio(
     path.join(RAIZ_PLUGIN, 'fluxo', 'adaptadores', 'nucleo'),
     destinoNucleoGlobal
   );
 
-  // 2. Cursor Global (~/.cursor/commands)
   if (ferramentas.includes('cursor')) {
     console.log('\n[2/4] Instalando comandos globais do Cursor...');
     const destinoCursorCmds = path.join(home, '.cursor', 'commands');
@@ -100,7 +98,6 @@ function instalarGlobal() {
     console.log('                em Cursor Settings > Rules > User Rules.');
   }
 
-  // 3. GitHub Copilot / VS Code Global (User/prompts)
   if (ferramentas.includes('copilot')) {
     console.log('\n[3/4] Instalando agentes e prompts globais do GitHub Copilot (VS Code)...');
     const pastaPromptsVSCode = obterPastaPromptsVSCode();
@@ -114,14 +111,13 @@ function instalarGlobal() {
     );
   }
 
-  // 4. Claude Code Global
   if (ferramentas.includes('claude')) {
     console.log('\n[4/4] Claude Code (escopo user):');
     console.log(`  -> Execute: claude plugin add --scope user "${path.join(RAIZ_PLUGIN, 'plugins', 'fluxo')}"`);
   }
 
   console.log('\n[INSTALADOR GLOBAL] Concluído com sucesso!');
-  console.log('[NOTA] Dentro de cada repositório de trabalho, rode /configurar-fluxo na primeira vez para gerar o .fluxo/config-modelo.md específico do projeto.');
+  console.log('[NOTA] Dentro de cada repositório de trabalho, rode /configurar-fluxo na primeira vez para gerar o .fluxo/config-modelo.md e descobrir o board.');
 }
 
 function instalarNoRepositorio() {
@@ -132,14 +128,12 @@ function instalarNoRepositorio() {
 
   const caminhosInstalados = ['.fluxo/'];
 
-  // 1. Instalar Núcleo (.fluxo)
   copiarDiretorio(
     path.join(RAIZ_PLUGIN, 'fluxo', 'adaptadores', 'nucleo'),
     path.join(caminhoAlvo, '.fluxo'),
     caminhoAlvo
   );
 
-  // 2. Instalar Adaptadores
   if (ferramentas.includes('copilot')) {
     copiarDiretorio(
       path.join(RAIZ_PLUGIN, 'fluxo', 'adaptadores', 'copilot', '.github'),
@@ -165,7 +159,6 @@ function instalarNoRepositorio() {
     );
   }
 
-  // 3. Atualizar .git/info/exclude se --local
   if (ehLocal) {
     const dirGitInfo = path.join(caminhoAlvo, '.git', 'info');
     const caminhoExclude = path.join(dirGitInfo, 'exclude');
