@@ -1,3 +1,5 @@
+<!-- Gerado por fluxo/scripts/gerar-adaptadores-fluxo.mjs a partir de fluxo/core/. Não edite diretamente. -->
+
 # Guia Completo de MCPs (Model Context Protocol)
 
 O Model Context Protocol (MCP) conecta os assistentes de IA (**Claude Code**, **GitHub Copilot** e **Cursor**) a ferramentas de gestão de tarefas, repositórios, nuvem e bancos de dados. O fluxo opera tanto **com MCPs ativos** quanto **sem MCPs** (podendo ser configurados posteriormente via `/configurar-fluxo`).

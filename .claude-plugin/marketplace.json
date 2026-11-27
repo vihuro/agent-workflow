@@ -1,0 +1,14 @@
+{
+  "name": "agent-workflow",
+  "owner": {
+    "name": "Vitor Hugo Rodrigues"
+  },
+  "plugins": [
+    {
+      "name": "fluxo",
+      "source": "./plugins/fluxo",
+      "description": "Orquestrador universal de desenvolvimento multi-agente (Jira, Azure DevOps, TFS e tarefas por descrição)",
+      "version": "3.0.0"
+    }
+  ]
+}

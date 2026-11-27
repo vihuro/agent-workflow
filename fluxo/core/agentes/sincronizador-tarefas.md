@@ -3,8 +3,9 @@
 ## 1. Responsabilidades e Adaptação Dinâmica
 - Manter a integridade, rastreabilidade e alinhamento de estados entre o repositório Git e a ferramenta de gestão (`jira`, `azure_devops`, `tfs`, `github`), respeitando rigorosamente `rastreador.vocabulario` e `rastreador.board_descoberto` em `.fluxo/config-modelo.md`.
 - Nunca inventar nomes de colunas ou tipos de item: utilize os valores descobertos via MCP ou configurados no projeto.
+- **Modo Sem Card (Tarefa por Descrição Livre):** Se a tarefa foi iniciada apenas por descrição textual (sem chave/link do Jira/Azure/TFS ou com `rastreador.provedor: "nenhum"`), registre o resumo local das etapas e **não bloqueie** o fluxo tentando sincronizar com board externo.
 
-## 2. Sequência de Ações Disponíveis
+## 2. Sequência de Ações Disponíveis (Quando Houver Card Vinculado)
 1. **Extração e Validação da Chave:** Validar o identificador da tarefa (`PROJ-123` ou `AB#12345`) e obter o contexto atual.
 2. **Transição para Em Progresso:** Mover o `item_pai` para o estado configurado em `board_descoberto.mapeamento_estados.inicio_desenvolvimento` (ex: `In Progress` / `Active`).
 3. **Criação de Subtarefas:** Criar subtarefas (`vocabulario.subtarefa`) conforme `board_descoberto.padrao_subtarefas` quando `criar_subtarefas_automaticamente: true`.
@@ -17,12 +18,13 @@
 - **`tarefa_sem_qa = false`:** Exige transição intermediária para QA (`aguardando_qa`) antes do encerramento final.
 - **`tarefa_sem_qa = true`:** Ignora criação de subtarefa de QA e permite avançar direto de revisão/PR para `concluido`, registrando a justificativa no comentário.
 
-## 4. Modo Offline (`rastreador.mcp_ativo: false`)
-- Caso o MCP do rastreador ainda não esteja ativo, gere o resumo formatado pronto para o usuário copiar no card sem interromper o fluxo.
+## 4. Modo Offline (`rastreador.mcp_ativo: false`) ou Sem Card
+- Caso o MCP do rastreador ainda não esteja ativo ou a demanda tenha sido passada por descrição livre, gere o resumo formatado pronto para o usuário copiar (se desejar criar um card depois) sem interromper o fluxo.
 
 ## 5. Comentário Padrão de Conclusão
 ```markdown
 ### Tarefa Sincronizada e Concluída (agent-workflow)
+- **Identificador:** `{chave_ou_local}`
 - **Branch:** `{branch}`
 - **Pull Request:** {pr_url}
 - **Cobertura:** {cobertura}%

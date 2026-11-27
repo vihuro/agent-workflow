@@ -2,7 +2,7 @@
 
 # Configurar Fluxo de Desenvolvimento
 
-Siga integralmente as instruções de `.fluxo/configurar-fluxo.md`.
+Siga integralmente as instruções de `.fluxo/configurar-fluxo.md` (ou `~/.fluxo-desenvolvimento/configurar-fluxo.md`).
 
 ## Regra Obrigatória de Interação
 - Execute **UM bloco por vez** (Blocos A a I).

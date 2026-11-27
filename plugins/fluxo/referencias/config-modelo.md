@@ -1,3 +1,5 @@
+<!-- Gerado por fluxo/scripts/gerar-adaptadores-fluxo.mjs a partir de fluxo/core/. Não edite diretamente. -->
+
 # Configuração do Fluxo de Desenvolvimento (`.fluxo/config-modelo.md`)
 
 > Este arquivo armazena os parâmetros específicos deste repositório. **Nunca grave senhas, tokens ou PATs aqui** (use variáveis de ambiente `${VAR}` ou credenciais locais do MCP em `~/.fluxo-desenvolvimento/`).
@@ -13,6 +15,7 @@ ferramentas_ia:
 
 rastreador:
   provedor: "azure_devops" # opcoes: jira | azure_devops | tfs | github | nenhum
+  aceitar_tarefa_por_descricao: true # permite iniciar o fluxo passando apenas uma descrição textual sem link/card no rastreador
   url_base: "https://dev.azure.com/organizacao"
   projeto_chave: "PROJ"
   area_path: "" # opcional (Azure DevOps / TFS)
@@ -75,6 +78,7 @@ repositorio:
   exigir_autorizacao_push: true
 
 comandos:
+  shell_preferencial: "powershell" # opcoes: powershell | bash | auto (acesso às ferramentas de terminal da máquina)
   build: "dotnet build"
   testes_unitarios: "dotnet test"
   testes_integracao: ""
@@ -86,7 +90,7 @@ tolerancia_falhas:
 
 qualidade:
   cobertura_codigo_minima: 80.0
-  cobertura_minim-novas_linhas: 85.0
+  cobertura_minima_novas_linhas: 85.0
   sonar:
     obrigatorio: false # true | false (false quando o fluxo vai direto para QA)
     medir_com_pipeline: false

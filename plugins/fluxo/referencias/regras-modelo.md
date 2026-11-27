@@ -1,3 +1,5 @@
+<!-- Gerado por fluxo/scripts/gerar-adaptadores-fluxo.mjs a partir de fluxo/core/. Não edite diretamente. -->
+
 # Regras Invioláveis do Modelo de Desenvolvimento
 
 Este documento estabelece os padrões obrigatórios e as diretrizes arquiteturais para o desenvolvimento de software no ecossistema. O cumprimento destas regras é verificado localmente pelo `Validador` e na esteira de integração contínua (CI).

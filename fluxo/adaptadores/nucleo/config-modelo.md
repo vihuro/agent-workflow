@@ -15,6 +15,7 @@ ferramentas_ia:
 
 rastreador:
   provedor: "azure_devops" # opcoes: jira | azure_devops | tfs | github | nenhum
+  aceitar_tarefa_por_descricao: true # permite iniciar o fluxo passando apenas uma descrição textual sem link/card no rastreador
   url_base: "https://dev.azure.com/organizacao"
   projeto_chave: "PROJ"
   area_path: "" # opcional (Azure DevOps / TFS)
@@ -77,6 +78,7 @@ repositorio:
   exigir_autorizacao_push: true
 
 comandos:
+  shell_preferencial: "powershell" # opcoes: powershell | bash | auto (acesso às ferramentas de terminal da máquina)
   build: "dotnet build"
   testes_unitarios: "dotnet test"
   testes_integracao: ""

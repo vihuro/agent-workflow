@@ -1,11 +1,11 @@
 ---
 mode: agent
 description: Configura o fluxo de desenvolvimento no repositório (.fluxo/config-modelo.md)
-tools: ['codebase', 'editFiles', 'askQuestions']
+tools: ['codebase', 'editFiles', 'runCommands', 'askQuestions']
 ---
 <!-- Gerado por fluxo/scripts/gerar-adaptadores-fluxo.mjs a partir de fluxo/core/. Não edite diretamente. -->
 
-Siga integralmente as instruções de `.fluxo/configurar-fluxo.md`.
+Siga integralmente as instruções de `.fluxo/configurar-fluxo.md` (ou `~/.fluxo-desenvolvimento/configurar-fluxo.md`).
 
 ## Regra Obrigatória de Interação
 - Execute **UM bloco por vez** (Blocos A a I).

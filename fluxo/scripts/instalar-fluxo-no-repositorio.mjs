@@ -112,8 +112,10 @@ function instalarGlobal() {
   }
 
   if (ferramentas.includes('claude')) {
-    console.log('\n[4/4] Claude Code (escopo user):');
-    console.log(`  -> Execute: claude plugin add --scope user "${path.join(RAIZ_PLUGIN, 'plugins', 'fluxo')}"`);
+    console.log('\n[4/4] Claude Code (Marketplace & Plugin):');
+    console.log(`  -> No Claude Code, execute:`);
+    console.log(`     /plugin marketplace add "${RAIZ_PLUGIN}"`);
+    console.log(`     /plugin install fluxo@agent-workflow`);
   }
 
   console.log('\n[INSTALADOR GLOBAL] Concluído com sucesso!');
@@ -154,8 +156,9 @@ function instalarNoRepositorio() {
 
   if (ferramentas.includes('claude')) {
     console.log(
-      '  -> Para Claude Code, instale o plugin via: claude plugin add ' +
-        path.join(RAIZ_PLUGIN, 'plugins', 'fluxo')
+      '  -> Para Claude Code, adicione o marketplace e instale o plugin:\n' +
+      `     /plugin marketplace add "${RAIZ_PLUGIN}"\n` +
+      '     /plugin install fluxo@agent-workflow'
     );
   }
 

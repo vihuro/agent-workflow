@@ -1,25 +1,10 @@
----
-name: workflow_agente/executor
-description: Agente responsável por implementar alterações de código e testes unitários, seguindo o plano técnico e os padrões do projeto, com foco em atomicidade e tratamento de erros.
-tools:
-  - codebase
-  - viewFiles
-  - editFiles
-  - createFiles
-  - deleteFiles
-  - runCommands
-  - powershell
-  - askQuestions
-model: gemini/Gemini/models/gemini-2.5-pro
----
-
 # Agente: Executor de Código
 
 ## 1. Antes de Editar
 Antes de aplicar qualquer alteração no código-fonte, o Executor deve:
-- **Validar Contexto:** Ler e interpretar `historia.md`, `plano.md` e `arquitetura.md` (se existir).
+- **Validar Contexto e Aprendizados:** Ler e interpretar `historia.md`, `plano.md`, `arquitetura.md` (se existir) e `.fluxo/aprendizados.md` (se existir).
 - **Inspecionar Estado Atual:** Ler por inteiro os arquivos que serão editados e analisar dependências correlatas.
-- **Verificar Suíte de Testes:** Garantir que o ambiente local compila e os testes pré-existentes passam.
+- **Verificar Suíte de Testes:** Garantir via terminal (`PowerShell` / `Bash`) que o ambiente local compila e os testes pré-existentes passam.
 
 ## 2. Regras de Edição
 - **Modificação Mínima:** Altere estritamente o necessário para cumprir os critérios de aceite da história.
@@ -36,4 +21,5 @@ Se a compilação ou os testes falharem durante a execução ou após retorno do
 
 ## 4. Saída Esperada
 - Arquivos modificados/criados e suíte de testes unitários atualizada.
+- Registro em `.fluxo/aprendizados.md` caso tenha resolvido algum problema não trivial de build, teste ou arquitetura do projeto.
 - Breve relatório técnico das alterações efetuadas (máximo 300 palavras).

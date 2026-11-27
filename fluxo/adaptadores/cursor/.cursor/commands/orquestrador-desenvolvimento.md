@@ -1,28 +1,10 @@
----
-command: /orquestrador-desenvolvimento
-description: Inicia o fluxo de desenvolvimento da squad agentica, orquestrando tarefas entre agentes especializados.
----
+<!-- Gerado por fluxo/scripts/gerar-adaptadores-fluxo.mjs a partir de fluxo/core/. Não edite diretamente. -->
 
-# Comando: /orquestrador-desenvolvimento
+# Orquestrador de Desenvolvimento
 
-Este comando inicia o fluxo de trabalho da squad agentica no ambiente Cursor. Ele delega a orquestração de uma tarefa de desenvolvimento ao Agente Orquestrador, que por sua vez coordena os demais agentes especializados.
-
-## Uso
-
-`@fluxo-desenvolvimento.mdc orquestrar-tarefa {{TASK_DESCRIPTION_OR_ID}}`
-
-Substitua `{{TASK_DESCRIPTION_OR_ID}}` pela descrição da tarefa (ex: "Criar módulo de autenticação") ou pelo ID do card no seu sistema de gestão (ex: "PROJ-123").
-
-## Como Funciona
-
-Ao invocar este comando, o Cursor ativará a regra `orquestrar-tarefa` do arquivo `fluxo-desenvolvimento.mdc`. Esta regra será responsável por:
-1.  Interpretar a tarefa fornecida.
-2.  Invocar os agentes especializados (definidos em `plugins/fluxo/agents/`) em sequência, passando o contexto necessário.
-3.  Utilizar ferramentas do Cursor (como `AskQuestion`, `Task`, `runCommand`) para interagir com o usuário e executar ações.
-4.  Seguir a lógica de orquestração definida no plano `squad-agentica-flow.md`.
-
-**Exemplos:**
-*   `/orquestrador-desenvolvimento Implementar busca de produtos por categoria.`
-*   `/orquestrador-desenvolvimento US-789`
-
-**Nota:** A lógica de delegação e interação dos agentes está definida em `fluxo-desenvolvimento.mdc` e nos arquivos de agente em `plugins/fluxo/agents/`.
+1. Verifique se `.fluxo/config-modelo.md` existe no repositório (ou consulte `~/.fluxo-desenvolvimento/config.md`). Se não existir, invoque `AskQuestion` perguntando se deseja executar `/configurar-fluxo` agora ou prosseguir com os padrões.
+2. Leia `.fluxo/aprendizados.md` (se existir) para aplicar aprendizados anteriores da squad.
+3. Aceite tanto uma **chave/link de card** (`PROJ-123`, `AB#12345`, URL) quanto uma **descrição textual livre da tarefa** (sem card no board, atribuindo identificador local `LOCAL-<slug>`).
+4. Leia e siga `.fluxo/playbook-orquestrador.md` (ou `~/.fluxo-desenvolvimento/playbook-orquestrador.md`) como sessão principal, utilizando terminal (`PowerShell` / `Bash`) quando necessário.
+5. Use `AskQuestion` para todas as confirmações obrigatórias (escopo inicial, ambiguidades do PO, limite de tentativas de build e autorização antes de `git push`).
+6. Delegue cada papel ativo aos subagentes (`Task`) seguindo as definições em `.fluxo/agentes/` sem parar o fluxo entre etapas automáticas.
