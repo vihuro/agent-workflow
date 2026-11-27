@@ -147,6 +147,40 @@ node .\scripts\orquestrador-squad-agentica.mjs cursor
 node .\scripts\orquestrador-squad-agentica.mjs claude
 ```
 
+### Iniciando uma Tarefa com o Agente Orquestrador
+
+Após a instalação e configuração do plugin em sua plataforma de IA, você pode iniciar um fluxo de desenvolvimento com a squad agentica interagindo diretamente com o Agente Orquestrador em seu ambiente de chat.
+
+#### **1. GitHub Copilot**
+
+1.  **Abra o Copilot Chat** na sua IDE.
+2.  **Invoque o Agente Orquestrador** usando o prompt de invocação e fornecendo a tarefa:
+    *   **Sintaxe:** `@orquestrador {{DESCRIÇÃO_DA_TAREFA_OU_ID}}`
+    *   **Exemplos:**
+        *   `@orquestrador Implementar funcionalidade de login com autenticação OAuth2.`
+        *   `@orquestrador PROJ-456` (se o rastreador de tarefas estiver configurado).
+3.  **Interaja no Chat:** O Agente Orquestrador o manterá atualizado sobre o progresso e fará perguntas para aprovações ou decisões críticas (via `askQuestions`).
+
+#### **2. Cursor**
+
+1.  **Abra o Cursor Chat** ou a barra de comandos (`Ctrl+Shift+P`).
+2.  **Invoque o Comando Orquestrador** que inicia o fluxo:
+    *   **Sintaxe:** `/orquestrador-desenvolvimento {{DESCRIÇÃO_DA_TAREFA_OU_ID}}`
+    *   **Exemplos:**
+        *   `/orquestrador-desenvolvimento Criar módulo de autenticação de usuários.`
+        *   `/orquestrador-desenvolvimento US-789`
+3.  **Interaja no Chat:** O Cursor executará o comando, e o Orquestrador o guiará pelo fluxo, solicitando feedback via `AskQuestion` quando necessário.
+
+#### **3. Claude (Conceitual - Depende da Integração de Plugins)**
+
+1.  **Abra o Claude Chat** (ou o ambiente de interação com agentes/skills).
+2.  **Invoque o Agente Orquestrador** e forneça a tarefa:
+    *   **Sintaxe (conceitual):** `@Orquestrador {{DESCRIÇÃO_DA_TAREFA}}`
+    *   **Exemplos:**
+        *   `@Orquestrador Desenvolver funcionalidade de carrinho de compras.`
+        *   `@Orquestrador Adicionar suporte a múltiplos idiomas na aplicação.`
+3.  **Interaja no Chat:** O Orquestrador o manterá informado e solicitará sua intervenção em pontos de decisão.
+
 ---
 
 ## Instalação

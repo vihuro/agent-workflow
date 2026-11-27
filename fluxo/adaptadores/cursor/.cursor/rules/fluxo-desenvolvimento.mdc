@@ -5,3 +5,17 @@ alwaysApply: true
 <!-- Gerado por fluxo/scripts/gerar-adaptadores-fluxo.mjs a partir de fluxo/core/. Não edite diretamente. -->
 
 Quando o usuário iniciar desenvolvimento de história/tarefa ou invocar `/orquestrador-desenvolvimento` ou `/configurar-fluxo`, siga rigorosamente `.fluxo/playbook-orquestrador.md`, `.fluxo/config-modelo.md`, `.fluxo/regras-modelo.md` e os agentes em `.fluxo/agentes/`. Use `AskQuestion` sempre que precisar de confirmação ou input do usuário (um bloco por vez), delegue papéis via `Task`, nunca faça commit direto na main/master e nunca execute git push sem aprovação explícita.
+
+# Regra: orquestrar-tarefa
+
+Quando a regra `orquestrar-tarefa` for invocada com uma `{{TASK_DESCRIPTION_OR_ID}}`, o Cursor deve:
+1. Ler e interpretar o `squad-agentica-flow.md` para seguir o plano de orquestração.
+2. Iniciar a Etapa 0 do `playbook-orquestrador.md`.
+3. Para cada etapa do fluxo, invocar o agente especializado correspondente (ex: `Task: po`, `Task: planejador`) com o prompt e contexto relevantes, passando a `{{TASK_DESCRIPTION_OR_ID}}` inicial e o estado atual da tarefa.
+4. Utilizar `AskQuestion` para todas as interações e confirmações com o usuário (ex: autorização para `git push`).
+5. Gerenciar o estado da tarefa através de variáveis persistentes do Cursor, se disponíveis, ou através da atualização dos arquivos de artefato (`historia.md`, `plano.md`, etc.).
+6. Utilizar ferramentas como `runCommand` (para `powershell`, `git status`, etc.) quando necessário.
+7. Reportar o progresso e o resultado final ao usuário.
+
+Exemplo de invocação:
+`@fluxo-desenvolvimento.mdc orquestrar-tarefa "Implementar funcionalidade X"`

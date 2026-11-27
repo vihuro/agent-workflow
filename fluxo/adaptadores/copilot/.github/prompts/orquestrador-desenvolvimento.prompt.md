@@ -1,13 +1,12 @@
 ---
-mode: agent
-description: Orquestra o fluxo completo de desenvolvimento de uma história ou tarefa (PO, planejador, arquiteto, executor, validador, TA, QA, commits e rastreador)
-tools: ['codebase', 'editFiles', 'runCommands', 'askQuestions']
+name: Iniciar Orquestração de Desenvolvimento
+description: Inicia o fluxo de desenvolvimento da squad agentica, delegando a tarefa ao Agente Orquestrador.
 ---
-<!-- Gerado por fluxo/scripts/gerar-adaptadores-fluxo.mjs a partir de fluxo/core/. Não edite diretamente. -->
 
-# Orquestrador de Desenvolvimento
+@orquestrador {{TASK_DESCRIPTION_OR_ID}}
 
-1. Se `.fluxo/config-modelo.md` não existir, use `askQuestions` perguntando se deseja executar `/configurar-fluxo` agora.
-2. Leia e siga `.fluxo/playbook-orquestrador.md` como sessão principal, respeitando o vocabulário e board descoberto.
-3. Use `askQuestions` para confirmações obrigatórias (escopo inicial, ambiguidades do PO, estouro de tentativas de build e autorização antes de `git push`).
-4. Delegue cada etapa ativa ao agente especializado correspondente (`@po`, `@planejador`, `@arquiteto`, `@executor`, `@validador`, `@especialista-testes-aceite`, `@qa`, `@sincronizador-tarefas`, `@especialista-commits`).
+Substitua `{{TASK_DESCRIPTION_OR_ID}}` pela descrição da tarefa (ex: "Desenvolver API de usuários com CRUD") ou pelo ID do card no seu sistema de gestão (ex: "PROJ-123").
+
+**Exemplos:**
+*   `@orquestrador Implementar funcionalidade de login com autenticação OAuth2.`
+*   `@orquestrador PROJ-456`
