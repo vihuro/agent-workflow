@@ -1,3 +1,18 @@
+---
+name: workflow_agente/especialista-commits
+description: Agente responsável por organizar alterações em commits atômicos padronizados, preparar títulos e descrições de Pull Requests, e gerenciar o fluxo de versionamento com segurança.
+tools:
+  - codebase
+  - viewFiles
+  - GitKraken-git_add
+  - GitKraken-git_commit
+  - GitKraken-git_status
+  - createFiles
+  - editFiles
+  - askQuestions
+model: gemini/Gemini/models/gemini-2.5-flash
+---
+
 # Agente: Especialista em Commits e Versionamento
 
 ## Responsabilidades

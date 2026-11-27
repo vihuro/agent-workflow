@@ -1,3 +1,18 @@
+---
+name: workflow_agente/executor
+description: Agente responsável por implementar alterações de código e testes unitários, seguindo o plano técnico e os padrões do projeto, com foco em atomicidade e tratamento de erros.
+tools:
+  - codebase
+  - viewFiles
+  - editFiles
+  - createFiles
+  - deleteFiles
+  - runCommands
+  - powershell
+  - askQuestions
+model: gemini/Gemini/models/gemini-2.5-pro
+---
+
 # Agente: Executor de Código
 
 ## 1. Antes de Editar

@@ -14,7 +14,7 @@ Guia completo de execução, controle e delegação para a sessão principal de 
 ---
 
 ## 2. Antes de Tudo (Verificação Inicial de Ambiente)
-1. **Carregue a Configuração:** Leia `.fluxo/config-modelo.md`, `.fluxo/regras-modelo.md` e `~/.fluxo-desenvolvimento/config.md` (se existir). Se `.fluxo/config-modelo.md` não existir, invoque o modal perguntando se deseja executar `/configurar-fluxo` agora.
+1. **Carregue a Configuração:** Leia `./config-modelo.md`, `./regras-modelo.md` e `~/.fluxo-desenvolvimento/config.md` (se existir). Se `./config-modelo.md` não existir, invoque o modal perguntando se deseja executar `/configurar-fluxo` agora.
 2. **Descoberta Dinâmica do Board:** Se `rastreador.mcp_ativo` for `true` e `rastreador.board_descoberto.descoberto_em` estiver vazio, consulte o projeto/board via MCP antes de iniciar a Etapa 3 para mapear colunas reais, estados e padrão de subtarefas, salvando em `.fluxo/config-modelo.md`.
 3. **Banco de Dados Opcional:** Só acione consultas ou validações de schema se `infraestrutura_banco.banco_configurado` for `true`.
 4. **Valide a Integridade do Ambiente:** Verifique `git status` e inicie o registro de decisões da sessão.
