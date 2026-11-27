@@ -14,8 +14,8 @@ Guia completo de execução, controle e delegação para a sessão principal de 
 ---
 
 ## 2. Antes de Tudo (Verificação Inicial de Ambiente)
-1. **Carregue a Configuração:** Leia `.fluxo/config-modelo.md`, `.fluxo/regras-modelo.md` e `~/.fluxo-desenvolvimento/config.md` (se existir). Se `.fluxo/config-modelo.md` não existir, invoque o modal perguntando se deseja executar `/configurar-fluxo` agora.
-2. **Descoberta Dinâmica do Board:** Se `rastreador.mcp_ativo` for `true` e `rastreador.board_descoberto.descoberto_em` estiver vazio, consulte o projeto/board via MCP antes de iniciar a Etapa 3 para mapear colunas reais, estados e padrão de subtarefas, salvando em `.fluxo/config-modelo.md`.
+1. **Carregue a Configuração:** Leia `./config-modelo.md`, `./regras-modelo.md` e `~/.fluxo-desenvolvimento/config.md` (se existir). Se `./config-modelo.md` não existir, invoque o modal perguntando se deseja executar `/configurar-fluxo` agora.
+2. **Descoberta Dinâmica do Board:** Se `rastreador.mcp_ativo` for `true` e `rastreador.board_descoberto.descoberto_em` estiver vazio, consulte o projeto/board via MCP antes de iniciar a Etapa 3 para mapear colunas reais, estados e padrão de subtarefas, salvando em `./config-modelo.md`.
 3. **Banco de Dados Opcional:** Só acione consultas ou validações de schema se `infraestrutura_banco.banco_configurado` for `true`.
 4. **Valide a Integridade do Ambiente:** Verifique `git status` e inicie o registro de decisões da sessão.
 
@@ -30,7 +30,7 @@ Guia completo de execução, controle e delegação para a sessão principal de 
 
 ## 4. Diretriz Absoluta: Sem Trabalho Fora de História
 - **Escopo Fechado:** Nenhuma linha de código deve ser alterada, criada ou removida se não estiver vinculada diretamente aos critérios de aceite da História ativa.
-- **Refatorações Oportunistas:** Caso seja identificado um *code smell* fora do escopo da História, a alteração **não deve ser feita**; registre-a em `.fluxo/aprendizados.md` / débitos técnicos para priorização posterior.
+- **Refatorações Oportunistas:** Caso seja identificado um *code smell* fora do escopo da História, a alteração **não deve ser feita**; registre-a em `./aprendizados.md` / débitos técnicos para priorização posterior.
 - **Gold-Plating Proibido:** Implementação de recursos adicionais ou abstrações não especificadas são consideradas falhas de orquestração.
 
 ---
@@ -39,7 +39,7 @@ Guia completo de execução, controle e delegação para a sessão principal de 
 O Orquestrador (sessão principal) atua como o **Regente Técnico**:
 - **Não Escreve Código Bruto Diretamente:** A geração de código e validações são delegadas aos papéis especializados.
 - **Guardião da Qualidade e Escopo:** Mantém o controle sobre os limites da História e garante a conformidade arquitetural.
-- **Sincronizador de Contexto:** Garante que todos os agentes operem com os mesmos artefatos (`historia.md`, `plano.md`, `arquitetura.md`, `qa.md`).
+- **Sincronizador de Contexto:** Garante que todos os agentes operem com os mesmos artefatos (`historia.md`, `plano.md`, `arquitetura.md`, `qa.md`, `aprendizados.md`).
 
 ---
 
