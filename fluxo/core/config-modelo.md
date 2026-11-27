@@ -86,6 +86,12 @@ tolerancia_falhas:
   max_tentativas_build_validacao: 3
   permitir_bypass_etapa_com_aprovacao_humana: true
 
+observabilidade:
+  ativo: true
+  painel_ao_vivo: ".fluxo/status-atual.md"
+  diretorio_execucoes: ".fluxo/execucoes"
+  banners_progresso_chat: true
+
 qualidade:
   cobertura_codigo_minima: 80.0
   cobertura_minima_novas_linhas: 85.0

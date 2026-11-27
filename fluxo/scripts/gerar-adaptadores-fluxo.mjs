@@ -72,7 +72,7 @@ const METADADOS_AGENTES = {
 };
 
 function lerArquivo(caminho) {
-  return fs.readFileSync(caminho, 'utf-8');
+  return fs.readFileSync(caminho, 'utf-8').replace(/^\uFEFF/, '');
 }
 
 function escreverArquivo(caminho, conteudo) {
@@ -119,7 +119,12 @@ function compilar() {
     const frontmatterClaude = `---\nname: ${nomeBase}\ndescription: ${meta.descricao}\ntools: ${meta.toolsClaude}\n---\n\n`;
     escreverArquivo(path.join(DIR_PLUGINS, 'agents', arquivo), frontmatterClaude + conteudoCompleto);
 
-    const frontmatterCopilot = `---\ndescription: ${meta.descricao}\ntools: ${meta.toolsCopilot}\n---\n\n`;
+    escreverArquivo(
+      path.join(DIR_ADAPTADORES, 'cursor', '.cursor', 'agents', arquivo),
+      frontmatterClaude + conteudoCompleto
+    );
+
+    const frontmatterCopilot = `---\nname: ${nomeBase}\ndescription: ${meta.descricao}\ntools: ${meta.toolsCopilot}\n---\n\n`;
     escreverArquivo(
       path.join(DIR_ADAPTADORES, 'copilot', '.github', 'agents', `${nomeBase}.agent.md`),
       frontmatterCopilot + conteudoCompleto
@@ -131,7 +136,8 @@ function compilar() {
     'configurar-fluxo.md',
     'mcps.md',
     'playbook-orquestrador.md',
-    'regras-modelo.md'
+    'regras-modelo.md',
+    'status-fluxo.md'
   ];
 
   for (const arq of arquivosBase) {
@@ -164,20 +170,46 @@ ${AVISO_GERADO}Siga integralmente as instruções de \`.fluxo/configurar-fluxo.m
   const promptOrquestradorCopilot = `---
 mode: agent
 description: Orquestra o fluxo completo de desenvolvimento de uma história com card ou tarefa por descrição livre (PO, planejador, arquiteto, executor, validador, TA, QA, commits e rastreador)
-tools: ['codebase', 'editFiles', 'runCommands', 'askQuestions']
+tools: ['codebase', 'editFiles', 'runCommands', 'askQuestions', 'runSubagent']
 ---
-${AVISO_GERADO}# Orquestrador de Desenvolvimento
+${AVISO_GERADO}# Orquestrador de Desenvolvimento (Squad Agêntica)
 
 1. Verifique se \`.fluxo/config-modelo.md\` existe no repositório (ou consulte \`~/.fluxo-desenvolvimento/config.md\`). Se não existir, use \`askQuestions\` perguntando se deseja executar \`/configurar-fluxo\` agora ou prosseguir com os padrões.
 2. Leia \`.fluxo/aprendizados.md\` (se existir) para carregar o histórico de aprendizados da squad neste repositório.
 3. Aceite tanto uma **chave/link de card** (\`PROJ-123\`, \`AB#12345\`, URL) quanto uma **descrição textual livre da tarefa** (sem atividade cadastrada no board, gerando identificador local \`LOCAL-<slug>\`).
 4. Leia e siga \`.fluxo/playbook-orquestrador.md\` (ou \`~/.fluxo-desenvolvimento/playbook-orquestrador.md\`) como sessão principal, com acesso às ferramentas de terminal (\`PowerShell\` / \`Bash\`).
-5. Use \`askQuestions\` para confirmações obrigatórias (escopo inicial, ambiguidades do PO, estouro de tentativas de build e autorização antes de \`git push\`).
-6. Delegue cada etapa ativa ao agente especializado correspondente (\`@po\`, \`@planejador\`, \`@arquiteto\`, \`@executor\`, \`@validador\`, \`@especialista-testes-aceite\`, \`@qa\`, \`@sincronizador-tarefas\`, \`@especialista-commits\`).
+5. **Observabilidade Obrigatória:** Mantenha o painel ao vivo \`.fluxo/status-atual.md\` e os artefatos em \`.fluxo/execucoes/<ID-TAREFA>/\` atualizados a cada início e fim de etapa, e exiba banners visuais no chat (\`▶️ [SQUAD | Etapa X] Acionando <Agente>...\` e \`✅ [SQUAD | Etapa X] <Agente> concluído...\`).
+6. Use \`askQuestions\` para confirmações obrigatórias (escopo inicial, ambiguidades do PO, estouro de tentativas de build e autorização antes de \`git push\`).
+7. Delegue cada etapa ativa automaticamente via \`runSubagent\` para os agentes da squad (\`po\`, \`planejador\`, \`arquiteto\`, \`executor\`, \`validador\`, \`especialista-testes-aceite\`, \`qa\`, \`sincronizador-tarefas\`, \`especialista-commits\`), encadeando as etapas até a conclusão.
 `;
   escreverArquivo(
     path.join(DIR_ADAPTADORES, 'copilot', '.github', 'prompts', 'orquestrador-desenvolvimento.prompt.md'),
     promptOrquestradorCopilot
+  );
+
+  const promptStatusCopilot = `---
+mode: agent
+description: Exibe em tempo real o painel de execução da Squad Agêntica (.fluxo/status-atual.md), etapa ativa, tentativas e artefatos gerados
+tools: ['codebase', 'runCommands']
+---
+${AVISO_GERADO}Siga as instruções de \`.fluxo/status-fluxo.md\` (ou \`~/.fluxo-desenvolvimento/status-fluxo.md\`) para inspecionar \`.fluxo/status-atual.md\`, \`.fluxo/execucoes/\` e \`git status\`, exibindo o resumo completo do andamento da Squad Agêntica.
+`;
+  escreverArquivo(
+    path.join(DIR_ADAPTADORES, 'copilot', '.github', 'prompts', 'status-fluxo.prompt.md'),
+    promptStatusCopilot
+  );
+
+  const agenteOrquestradorCopilot = `---
+name: orquestrador-desenvolvimento
+description: Regente técnico da Squad Agêntica que orquestra automaticamente PO, Planejador, Arquiteto, Executor, Validador, Testes de Aceite, QA, Sincronizador e Commits.
+tools: ['codebase', 'editFiles', 'runCommands', 'askQuestions', 'runSubagent']
+agents: ['po', 'planejador', 'arquiteto', 'executor', 'validador', 'especialista-testes-aceite', 'qa', 'sincronizador-tarefas', 'especialista-commits']
+---
+${AVISO_GERADO}${lerArquivo(path.join(DIR_CORE, 'playbook-orquestrador.md')).trim()}
+`;
+  escreverArquivo(
+    path.join(DIR_ADAPTADORES, 'copilot', '.github', 'agents', 'orquestrador-desenvolvimento.agent.md'),
+    agenteOrquestradorCopilot
   );
 
   // Commands & Rules Cursor (.cursor/)
@@ -196,25 +228,35 @@ Siga integralmente as instruções de \`.fluxo/configurar-fluxo.md\` (ou \`~/.fl
     cmdConfigurarCursor
   );
 
-  const cmdOrquestradorCursor = `${AVISO_GERADO}# Orquestrador de Desenvolvimento
+  const cmdOrquestradorCursor = `${AVISO_GERADO}# Orquestrador de Desenvolvimento (Squad Agêntica)
 
 1. Verifique se \`.fluxo/config-modelo.md\` existe no repositório (ou consulte \`~/.fluxo-desenvolvimento/config.md\`). Se não existir, invoque \`AskQuestion\` perguntando se deseja executar \`/configurar-fluxo\` agora ou prosseguir com os padrões.
 2. Leia \`.fluxo/aprendizados.md\` (se existir) para aplicar aprendizados anteriores da squad.
 3. Aceite tanto uma **chave/link de card** (\`PROJ-123\`, \`AB#12345\`, URL) quanto uma **descrição textual livre da tarefa** (sem card no board, atribuindo identificador local \`LOCAL-<slug>\`).
 4. Leia e siga \`.fluxo/playbook-orquestrador.md\` (ou \`~/.fluxo-desenvolvimento/playbook-orquestrador.md\`) como sessão principal, utilizando terminal (\`PowerShell\` / \`Bash\`) quando necessário.
-5. Use \`AskQuestion\` para todas as confirmações obrigatórias (escopo inicial, ambiguidades do PO, limite de tentativas de build e autorização antes de \`git push\`).
-6. Delegue cada papel ativo aos subagentes (\`Task\`) seguindo as definições em \`.fluxo/agentes/\` sem parar o fluxo entre etapas automáticas.
+5. **Observabilidade Obrigatória:** Atualize \`.fluxo/status-atual.md\` e salve os artefatos em \`.fluxo/execucoes/<ID-TAREFA>/\` antes e depois de cada agente, exibindo banners visuais no chat (\`▶️ [SQUAD | Etapa X] Acionando <Agente>...\` e \`✅ [SQUAD | Etapa X] <Agente> concluído...\`).
+6. Use \`AskQuestion\` para todas as confirmações obrigatórias (escopo inicial, ambiguidades do PO, limite de tentativas de build e autorização antes de \`git push\`).
+7. Delegue cada papel ativo automaticamente aos subagentes (\`Task\`) seguindo as definições em \`.cursor/agents/\` (ou \`.fluxo/agentes/\`) sem parar o fluxo entre etapas automáticas.
 `;
   escreverArquivo(
     path.join(DIR_ADAPTADORES, 'cursor', '.cursor', 'commands', 'orquestrador-desenvolvimento.md'),
     cmdOrquestradorCursor
   );
 
+  const cmdStatusCursor = `${AVISO_GERADO}# Status de Execução da Squad Agêntica
+
+Siga as instruções de \`.fluxo/status-fluxo.md\` (ou \`~/.fluxo-desenvolvimento/status-fluxo.md\`) para ler \`.fluxo/status-atual.md\`, listar os artefatos em \`.fluxo/execucoes/\` e verificar o \`git status\`, apresentando o painel completo de progresso dos agentes da squad.
+`;
+  escreverArquivo(
+    path.join(DIR_ADAPTADORES, 'cursor', '.cursor', 'commands', 'status-fluxo.md'),
+    cmdStatusCursor
+  );
+
   const ruleCursor = `---
 description: Regras do fluxo de desenvolvimento orquestrado (agent-workflow)
 alwaysApply: true
 ---
-${AVISO_GERADO}Quando o usuário iniciar desenvolvimento de história/tarefa (por link/chave de card ou por descrição textual livre) ou invocar \`/orquestrador-desenvolvimento\` ou \`/configurar-fluxo\`, siga rigorosamente \`.fluxo/playbook-orquestrador.md\`, \`.fluxo/config-modelo.md\`, \`.fluxo/regras-modelo.md\`, \`.fluxo/aprendizados.md\` e os agentes em \`.fluxo/agentes/\` (ou \`~/.fluxo-desenvolvimento/\`). Use \`AskQuestion\` sempre que precisar de confirmação ou input do usuário (um bloco por vez), delegue papéis via \`Task\`, utilize \`PowerShell\`/\`Bash\` para comandos locais, nunca faça commit direto na main/master e nunca execute git push sem aprovação explícita.
+${AVISO_GERADO}Quando o usuário iniciar desenvolvimento de história/tarefa (por link/chave de card ou por descrição textual livre) ou invocar \`/orquestrador-desenvolvimento\` ou \`/configurar-fluxo\`, siga rigorosamente \`.fluxo/playbook-orquestrador.md\`, \`.fluxo/config-modelo.md\`, \`.fluxo/regras-modelo.md\`, \`.fluxo/aprendizados.md\` e os subagentes da squad em \`.cursor/agents/\` / \`.fluxo/agentes/\` (ou \`~/.fluxo-desenvolvimento/\`). Use \`AskQuestion\` sempre que precisar de confirmação ou input do usuário (um bloco por vez), delegue papéis automaticamente via \`Task\`, utilize \`PowerShell\`/\`Bash\` para comandos locais, nunca faça commit direto na main/master e nunca execute git push sem aprovação explícita.
 `;
   escreverArquivo(
     path.join(DIR_ADAPTADORES, 'cursor', '.cursor', 'rules', 'fluxo-desenvolvimento.mdc'),
@@ -255,8 +297,10 @@ ${AVISO_GERADO}Atue como Orquestrador seguindo o playbook empacotado neste plugi
 - **Não exija link ou ID de card como regra absoluta:** aceite tanto uma chave/URL de tarefa (\`PROJ-123\`, \`AB#12345\`) quanto uma **descrição textual direta** (para adiantar desenvolvimento ou trabalhar sem atividade no board, atribuindo um identificador local \`LOCAL-<slug>\` e pulando a sincronização externa com o board).
 - Utilize \`Bash\` / \`PowerShell\` livremente para verificações de ambiente, Git, builds e testes quando necessário.
 
-## Regras de Execução e Delegação com Prefixo do Plugin
+  // Regras de Execução, Observabilidade Ao Vivo e Delegação com Prefixo do Plugin
 - Crie a lista de etapas aplicáveis usando \`TodoWrite\` logo no início para manter o progresso rastreado.
+- **Painel Ao Vivo (\`.fluxo/status-atual.md\`) e Artefatos (\`.fluxo/execucoes/<ID-TAREFA>/\`):** Siga \`\${CLAUDE_PLUGIN_ROOT}/referencias/status-fluxo.md\` para criar e atualizar \`.fluxo/status-atual.md\` **antes** e **depois** de cada subagente, salvando os artefatos da tarefa em \`.fluxo/execucoes/<ID-TAREFA>/\`.
+- **Banners no Chat:** Exiba um banner curto no chat antes de acionar cada subagente (\`▶️ [SQUAD | Etapa X] Acionando fluxo:<agente>...\`) e logo após o retorno (\`✅ [SQUAD | Etapa X] fluxo:<agente> concluído...\`).
 - Sempre que precisar de confirmação ou decisão humana (escopo inicial na Etapa 0, dúvidas do PO, estouro do limite de tentativas de build ou autorização antes de \`git push\` na Etapa 8), invoque obrigatoriamente \`AskUserQuestion\`.
 - Delegue cada etapa ativa usando a ferramenta \`Task\` com o prefixo \`fluxo:\` no \`subagent_type\`:
   - \`fluxo:po\`
@@ -273,6 +317,18 @@ ${AVISO_GERADO}Atue como Orquestrador seguindo o playbook empacotado neste plugi
   escreverArquivo(
     path.join(DIR_PLUGINS, 'skills', 'orquestrador-desenvolvimento', 'SKILL.md'),
     skillOrquestradorClaude
+  );
+
+  const skillStatusClaude = `---
+name: status-fluxo
+description: Inspeciona e exibe o painel em tempo real da Squad Agêntica (.fluxo/status-atual.md), etapa atual, tentativas e artefatos gerados
+allowed-tools: Read, Bash, Glob, Grep
+---
+${AVISO_GERADO}Siga as instruções empacotadas neste plugin em \`\${CLAUDE_PLUGIN_ROOT}/referencias/status-fluxo.md\` para ler \`.fluxo/status-atual.md\`, listar os artefatos em \`.fluxo/execucoes/\` e verificar o estado do Git, apresentando um resumo claro do que a Squad Agêntica está fazendo ou já concluiu.
+`;
+  escreverArquivo(
+    path.join(DIR_PLUGINS, 'skills', 'status-fluxo', 'SKILL.md'),
+    skillStatusClaude
   );
 
   // Plugin manifest (plugins/fluxo/.claude-plugin/plugin.json) & Marketplace (.claude-plugin/marketplace.json)
@@ -328,9 +384,17 @@ Dentro do Claude Code, adicione este repositório como marketplace e instale o p
 /plugin install fluxo@agent-workflow
 \`\`\`
 
+## Atualização (Quando já estiver instalado)
+\`\`\`text
+/plugin marketplace update agent-workflow
+/plugin update fluxo@agent-workflow
+\`\`\`
+*(Ou rode \`/plugin uninstall fluxo@agent-workflow\` seguido de \`/plugin install fluxo@agent-workflow\` e recarregue a janela da IDE).*
+
 ## Comandos / Skills
 - \`/fluxo:configurar-fluxo\`
 - \`/fluxo:orquestrador-desenvolvimento <CHAVE-TAREFA ou DESCRIÇÃO DA TAREFA>\`
+- \`/fluxo:status-fluxo\` (verifica em tempo real o painel \`.fluxo/status-atual.md\` e os artefatos da execução)
 `;
   escreverArquivo(path.join(DIR_PLUGINS, 'README.md'), readmePlugin);
 

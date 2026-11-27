@@ -13,8 +13,9 @@ O sistema opera via uma **Sessão Principal como Orquestrador**, onde o assisten
 3. **Entrada Flexível (Com Card ou Por Descrição Livre):** Aceita tanto uma **chave/link de tarefa** (`PROJ-123`, `AB#12345`, URL) quanto uma **descrição textual direta** (para adiantar um desenvolvimento ou atuar sem atividade no board, gerando um identificador local `LOCAL-<slug>` e pulando apenas a sincronização externa com o board).
 4. **Acesso Global às Ferramentas de Terminal (`PowerShell` / `Bash`):** O Orquestrador e os agentes operacionais (`Executor`, `Validador`, `QA`, `Especialista em Commits`) possuem acesso explícito às ferramentas de terminal da máquina para compilar, rodar testes, validar linters e operar o Git, enquanto agentes de especificação/auditoria têm ferramentas restritas às suas funções.
 5. **Memória e Aprendizado Contínuo da Squad (`.fluxo/aprendizados.md`):** Todos os agentes **leem** `.fluxo/aprendizados.md` antes de iniciar sua etapa e **registram** novos aprendizados ao resolver problemas do repositório, evoluindo o conhecimento coletivo da squad.
-6. **Descobre o Ambiente Dinamicamente:** Quando um MCP de rastreador está ativo, inspeciona o projeto/board para mapear colunas, estados válidos, vocabulário (`Story`/`User Story`/`Product Backlog Item`/`Issue` e `Sub-task`/`Task`/`Subtarefa`) e padrão de subtarefas, ajustando o fluxo sem bloqueios desnecessários.
-7. **Delega para Subagentes (`Task` / `@agente`):** Encadeia automaticamente os 9 papéis especializados ativos (usando o prefixo `fluxo:<papel>` no Claude Code), gerenciando a passagem de contexto e impondo as travas de segurança e qualidade do projeto.
+6. **Observabilidade em Tempo Real (`.fluxo/status-atual.md` + `/status-fluxo`):** O Orquestrador atualiza o painel ao vivo `.fluxo/status-atual.md` (que você pode deixar aberto com *Markdown Preview* na IDE), salva todos os entregáveis em `.fluxo/execucoes/<ID-TAREFA>/`, emite banners visuais no chat a cada transição de agente (`▶️ [SQUAD | Etapa X] Acionando...` / `✅ [SQUAD | Etapa X] Concluído...`) e disponibiliza o comando `/status-fluxo` (`/fluxo:status-fluxo` no Claude Code).
+7. **Descobre o Ambiente Dinamicamente:** Quando um MCP de rastreador está ativo, inspeciona o projeto/board para mapear colunas, estados válidos, vocabulário (`Story`/`User Story`/`Product Backlog Item`/`Issue` e `Sub-task`/`Task`/`Subtarefa`) e padrão de subtarefas, ajustando o fluxo sem bloqueios desnecessários.
+8. **Delega para Subagentes (`Task` / `runSubagent`):** Encadeia automaticamente os 9 papéis especializados ativos (usando o prefixo `fluxo:<papel>` no Claude Code), gerenciando a passagem de contexto e impondo as travas de segurança e qualidade do projeto.
 
 ---
 
@@ -131,16 +132,39 @@ Para usar em qualquer repositório:
 - Iniciar desenvolvimento com card ou por descrição livre:
   `/fluxo:orquestrador-desenvolvimento PROJ-123`
   `/fluxo:orquestrador-desenvolvimento Criar endpoint de exportação CSV no módulo de relatórios`
+- Acompanhar a execução dos agentes em tempo real:
+  `/fluxo:status-fluxo` (ou abra `.fluxo/status-atual.md` no editor)
 
 ### 3. Instalar no GitHub Copilot e Cursor (Global ou Por Repositório)
 ```bash
-# Instalação Global (Copilot no VS Code + Comandos Globais do Cursor + Núcleo em ~/.fluxo-desenvolvimento)
+# Instalação Global (Copilot no VS Code + Comandos e Subagentes Globais do Cursor + Núcleo em ~/.fluxo-desenvolvimento)
 node fluxo/scripts/instalar-fluxo-no-repositorio.mjs --global
 
 # Ou Instalação Isolada por Repositório (adiciona automaticamente ao .git/info/exclude)
 node fluxo/scripts/instalar-fluxo-no-repositorio.mjs --alvo /caminho/do/projeto --ferramentas copilot,cursor --local
 ```
-Para usar:
-- **GitHub Copilot Chat:** `/configurar-fluxo` e `/orquestrador-desenvolvimento <CARD ou DESCRIÇÃO DA TAREFA>`
-- **Cursor Chat:** `/configurar-fluxo` e `/orquestrador-desenvolvimento <CARD ou DESCRIÇÃO DA TAREFA>`
+### 4. Como Atualizar uma Instalação Existente (Sem Perder sua Configuração)
+
+Sempre que houver mudanças neste repositório (`fluxo/core/`):
+
+1. **Recompile os adaptadores:**
+   ```bash
+   node fluxo/scripts/gerar-adaptadores-fluxo.mjs
+   ```
+2. **Para atualizar o GitHub Copilot, o Cursor e o Núcleo Global (`~/.fluxo-desenvolvimento`):**
+   ```bash
+   # Atualiza agentes, prompts e comandos globais preservando config-modelo.md e aprendizados.md
+   node fluxo/scripts/instalar-fluxo-no-repositorio.mjs --global --atualizar
+
+   # Se você também instalou localmente em um repositório específico:
+   node fluxo/scripts/instalar-fluxo-no-repositorio.mjs --alvo /caminho/do/projeto --local --atualizar
+   ```
+   *(O instalador preserva automaticamente seu `.fluxo/config-modelo.md` e `.fluxo/aprendizados.md` já configurados. Caso queira resetar o `config-modelo.md` para o padrão de fábrica, adicione `--forcar-config`).*
+3. **Para atualizar o Plugin no Claude Code:**
+   Dentro do chat do Claude Code, execute:
+   ```text
+   /plugin marketplace update agent-workflow
+   /plugin update fluxo@agent-workflow
+   ```
+   *(Dica: se a versão `3.0.0` em `fluxo/versao.json` não tiver mudado e o Claude Code mantiver o cache da versão, basta rodar `/plugin uninstall fluxo@agent-workflow` e em seguida `/plugin install fluxo@agent-workflow`, e recarregar a janela do VS Code com `Developer: Reload Window`).*
 

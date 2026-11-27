@@ -15,8 +15,10 @@ Atue como Orquestrador seguindo o playbook empacotado neste plugin em `${CLAUDE_
 - **Não exija link ou ID de card como regra absoluta:** aceite tanto uma chave/URL de tarefa (`PROJ-123`, `AB#12345`) quanto uma **descrição textual direta** (para adiantar desenvolvimento ou trabalhar sem atividade no board, atribuindo um identificador local `LOCAL-<slug>` e pulando a sincronização externa com o board).
 - Utilize `Bash` / `PowerShell` livremente para verificações de ambiente, Git, builds e testes quando necessário.
 
-## Regras de Execução e Delegação com Prefixo do Plugin
+  // Regras de Execução, Observabilidade Ao Vivo e Delegação com Prefixo do Plugin
 - Crie a lista de etapas aplicáveis usando `TodoWrite` logo no início para manter o progresso rastreado.
+- **Painel Ao Vivo (`.fluxo/status-atual.md`) e Artefatos (`.fluxo/execucoes/<ID-TAREFA>/`):** Siga `${CLAUDE_PLUGIN_ROOT}/referencias/status-fluxo.md` para criar e atualizar `.fluxo/status-atual.md` **antes** e **depois** de cada subagente, salvando os artefatos da tarefa em `.fluxo/execucoes/<ID-TAREFA>/`.
+- **Banners no Chat:** Exiba um banner curto no chat antes de acionar cada subagente (`▶️ [SQUAD | Etapa X] Acionando fluxo:<agente>...`) e logo após o retorno (`✅ [SQUAD | Etapa X] fluxo:<agente> concluído...`).
 - Sempre que precisar de confirmação ou decisão humana (escopo inicial na Etapa 0, dúvidas do PO, estouro do limite de tentativas de build ou autorização antes de `git push` na Etapa 8), invoque obrigatoriamente `AskUserQuestion`.
 - Delegue cada etapa ativa usando a ferramenta `Task` com o prefixo `fluxo:` no `subagent_type`:
   - `fluxo:po`

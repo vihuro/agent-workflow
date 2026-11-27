@@ -1,6 +1,6 @@
 {
   "name": "fluxo",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Orquestrador universal de desenvolvimento multi-agente (Jira, Azure DevOps, TFS e tarefas por descrição)",
   "keywords": [
     "orchestrator",

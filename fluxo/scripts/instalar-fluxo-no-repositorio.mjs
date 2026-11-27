@@ -25,7 +25,16 @@ const alvoArg = obterArg('--alvo') || '.';
 const ferramentasArg = obterArg('--ferramentas') || 'copilot,cursor,claude';
 const ehLocal = args.includes('--local');
 const ehGlobal = args.includes('--global');
+const ehAtualizar = args.includes('--atualizar');
+const forcarConfig = args.includes('--forcar-config');
 const ehSimulacao = args.includes('--simular');
+
+const ARQUIVOS_PRESERVADOS_NO_DESTINO = new Set([
+  'config-modelo.md',
+  'config.md',
+  'aprendizados.md',
+  'status-atual.md'
+]);
 
 const caminhoAlvo = path.resolve(alvoArg);
 const ferramentas = ferramentasArg
@@ -64,7 +73,12 @@ function copiarDiretorio(origem, destino, baseLog) {
       copiarDiretorio(src, dest, baseLog);
     } else {
       const rotulo = baseLog ? path.relative(baseLog, dest) : dest;
-      console.log(`  -> ${ehSimulacao ? '[SIMULAR] ' : ''}${rotulo}`);
+      const jaExiste = fs.existsSync(dest);
+      if (jaExiste && ARQUIVOS_PRESERVADOS_NO_DESTINO.has(item) && !forcarConfig) {
+        console.log(`  -> [PRESERVADO] ${rotulo} (use --forcar-config para sobrescrever)`);
+        continue;
+      }
+      console.log(`  -> ${ehSimulacao ? '[SIMULAR] ' : jaExiste ? '[ATUALIZADO] ' : ''}${rotulo}`);
       if (!ehSimulacao) {
         fs.copyFileSync(src, dest);
       }
@@ -87,11 +101,16 @@ function instalarGlobal() {
   );
 
   if (ferramentas.includes('cursor')) {
-    console.log('\n[2/4] Instalando comandos globais do Cursor...');
+    console.log('\n[2/4] Instalando comandos e subagentes globais do Cursor...');
     const destinoCursorCmds = path.join(home, '.cursor', 'commands');
     copiarDiretorio(
       path.join(RAIZ_PLUGIN, 'fluxo', 'adaptadores', 'cursor', '.cursor', 'commands'),
       destinoCursorCmds
+    );
+    const destinoCursorAgents = path.join(home, '.cursor', 'agents');
+    copiarDiretorio(
+      path.join(RAIZ_PLUGIN, 'fluxo', 'adaptadores', 'cursor', '.cursor', 'agents'),
+      destinoCursorAgents
     );
     console.log('  [DICA CURSOR] Para ativar a regra globalmente, cole o conteúdo de:');
     console.log(`                ${path.join(RAIZ_PLUGIN, 'fluxo', 'adaptadores', 'cursor', '.cursor', 'rules', 'fluxo-desenvolvimento.mdc')}`);
@@ -113,9 +132,13 @@ function instalarGlobal() {
 
   if (ferramentas.includes('claude')) {
     console.log('\n[4/4] Claude Code (Marketplace & Plugin):');
-    console.log(`  -> No Claude Code, execute:`);
+    console.log(`  -> Primeiríssima instalação no Claude Code:`);
     console.log(`     /plugin marketplace add "${RAIZ_PLUGIN}"`);
     console.log(`     /plugin install fluxo@agent-workflow`);
+    console.log(`  -> Se já estiver instalado (para atualizar):`);
+    console.log(`     /plugin marketplace update agent-workflow`);
+    console.log(`     /plugin update fluxo@agent-workflow`);
+    console.log(`     (ou: /plugin uninstall fluxo@agent-workflow  seguido de  /plugin install fluxo@agent-workflow e Reload Window)`);
   }
 
   console.log('\n[INSTALADOR GLOBAL] Concluído com sucesso!');
@@ -151,7 +174,7 @@ function instalarNoRepositorio() {
       path.join(caminhoAlvo, '.cursor'),
       caminhoAlvo
     );
-    caminhosInstalados.push('.cursor/commands/', '.cursor/rules/fluxo-desenvolvimento.mdc');
+    caminhosInstalados.push('.cursor/agents/', '.cursor/commands/', '.cursor/rules/fluxo-desenvolvimento.mdc');
   }
 
   if (ferramentas.includes('claude')) {

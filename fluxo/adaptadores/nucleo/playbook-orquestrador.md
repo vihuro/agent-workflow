@@ -12,7 +12,12 @@ Guia completo de execução, controle e delegação para a sessão principal de 
   - **Cursor:** `AskQuestion`
   - **GitHub Copilot:** `askQuestions` (ou pergunta objetiva aguardando resposta no turno)
 - **Acesso Global a Ferramentas de Terminal e Sistema:** O Orquestrador e os agentes operacionais (`Executor`, `Validador`, `QA`, `Especialista em Commits`) possuem acesso às ferramentas de terminal da máquina (`PowerShell` no Windows / `Bash` no Linux e macOS), sistema de arquivos e Git para inspecionar o ambiente, compilar, testar e versionar sem bloqueios.
-- **Execução Contínua:** Mantenha a lista de etapas aplicáveis ativa (`TodoWrite` no Claude Code / checklist interno no Cursor e Copilot) e encadeie os subagentes (`Task` / `@agente`) automaticamente sem interromper o fluxo entre etapas automáticas.
+- **Execução Contínua e Observabilidade em Tempo Real:**
+  - Mantenha a lista de etapas aplicáveis ativa (`TodoWrite` no Claude Code / checklist interno no Cursor e Copilot) e encadeie os subagentes (`Task` / `runSubagent`) automaticamente sem interromper o fluxo entre etapas automáticas.
+  - **Painel Ao Vivo (`.fluxo/status-atual.md`) e Pasta de Artefatos (`.fluxo/execucoes/<ID-TAREFA>/`):** Atualize `.fluxo/status-atual.md` (seguindo o formato de `status-fluxo.md`) **antes** de acionar cada subagente (marcando `🔄 Em execução`) e **logo após** o retorno (marcando `✅ Concluído`, `❌ Reprovado` ou `⏭️ Pulado` e adicionando uma linha na seção *Linha do Tempo*). Salve os artefatos da tarefa em `.fluxo/execucoes/<ID-TAREFA>/`.
+  - **Banners de Transição no Chat:** Emita sempre um aviso visual curto no chat ao iniciar e ao concluir cada agente da squad:
+    - Ao iniciar: `▶️ [SQUAD | Etapa X] Acionando <Agente> (<objetivo curto>)...`
+    - Ao concluir: `✅ [SQUAD | Etapa X] <Agente> concluído (<resumo do entregável>) -> Próximo: <Próximo Agente>` (ou `❌ [SQUAD | Etapa X] <Agente> reportou falha (Tentativa N/M)...`).
 
 ---
 
@@ -26,11 +31,10 @@ Guia completo de execução, controle e delegação para a sessão principal de 
 
 ---
 
-## 3. Como Delegar a Cada Papel
-- **Claude Code (Plugin `fluxo`):** Invoque os subagentes do plugin via `Task` usando obrigatoriamente o prefixo `fluxo:` no `subagent_type`:
-  - `fluxo:po`, `fluxo:planejador`, `fluxo:arquiteto`, `fluxo:executor`, `fluxo:validador`, `fluxo:especialista-testes-aceite`, `fluxo:qa`, `fluxo:sincronizador-tarefas`, `fluxo:especialista-commits`.
-- **GitHub Copilot:** Encaminhe o contexto chamando `@po`, `@planejador`, `@arquiteto`, `@executor`, `@validador`, `@especialista-testes-aceite`, `@qa`, `@sincronizador-tarefas`, `@especialista-commits` (ou via subagentes).
-- **Cursor:** Utilize as regras `@fluxo-desenvolvimento.mdc`, subagentes via `Task` e comandos `/comando`.
+## 3. Como Delegar a Cada Papel (Execução Automática da Squad nas 3 IDEs)
+- **Claude Code (Plugin `fluxo`):** Invoque os subagentes do plugin via ferramenta `Task` usando obrigatoriamente o prefixo `fluxo:` no `subagent_type` (`fluxo:po`, `fluxo:planejador`, `fluxo:arquiteto`, `fluxo:executor`, `fluxo:validador`, `fluxo:especialista-testes-aceite`, `fluxo:qa`, `fluxo:sincronizador-tarefas`, `fluxo:especialista-commits`).
+- **GitHub Copilot (VS Code):** Invoque cada papel automaticamente via ferramenta `runSubagent` (passando o nome do agente customizado `po`, `planejador`, `arquiteto`, `executor`, `validador`, `especialista-testes-aceite`, `qa`, `sincronizador-tarefas`, `especialista-commits` ou as instruções de `.github/agents/<papel>.agent.md`), encadeando as etapas sem exigir que o usuário chame `@agente` manualmente.
+- **Cursor:** Invoque cada papel automaticamente via ferramenta `Task` usando os agentes em `.cursor/agents/<papel>.md` (ou `.fluxo/agentes/<papel>.md`), mantendo a regra `@fluxo-desenvolvimento.mdc` ativa.
 
 ---
 
